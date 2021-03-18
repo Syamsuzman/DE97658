@@ -1,0 +1,80 @@
+#include <LiquidCrystal.h> //Load Liquid Crystal Library
+LiquidCrystal LCD(11,10,9,2,3,4,5);  //Create Liquid Crystal Object called LCD
+
+#define trigPin 13 //Sensor Echo pin connected to Arduino pin 13
+#define echoPin 12 //Sensor Trip pin connected to Arduino pin 12
+
+
+void setup() 
+{  
+  LCD.begin(16,2); //Tell Arduino to start your 16 column 2 row LCD
+  pinMode(trigPin, OUTPUT);// Sets the trigPin as an Output
+  pinMode(echoPin, INPUT);// Sets the echoPin as an Input
+  Serial.begin(9600);// Starts the serial communication
+  
+  
+   
+}
+
+void loop() {
+  
+  long duration;
+  float distance_cm;
+  float distance_inc;
+  
+  digitalWrite(trigPin, LOW);// Clears the trigPin
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);// Sets the trigPin on HIGH state for 10 micro seconds
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echoPin, HIGH);// Reads the echoPin, returns the sound wave travel time in microseconds
+  distance_cm = 0.01723 * duration;//calculation to get cm
+  distance_inc = (distance_cm * 0.393701);//calculation to get inc
+  
+  if (distance_cm > 336 || distance_cm <= 0){//the condition 
+  Serial.println("Not detect");//to show in serial monitor
+  }
+  
+  else{
+  Serial.print(" Distance: ");//to show in serial monitor
+  Serial.print(distance_cm,1);//Print measured distance in cm
+  Serial.print(" CM ");//to show in serial monitor
+  Serial.print(distance_inc,1);//Print measured distance in inc
+  Serial.print(" Inc");//to show in serial monitor 
+  Serial.print("\n");//for new line 
+  }
+  
+  
+  LCD.setCursor(10,0);  //Set cursor to first column of second row
+  LCD.print("                "); //Print blanks to clear the row
+  LCD.setCursor(0,0);   //Set Cursor again to first column of second row
+  
+  if (distance_cm > 336 || distance_cm <= 0){
+  LCD.print("Not Detect");//for show in LCD
+  }
+  
+  else{
+  LCD.print("Dist: ");//for show in LCD
+  LCD.print(distance_cm,1); //Print measured distance
+  LCD.print(" CM ");  //Print your units
+  delay(1000);//use to let things settle
+  }
+  
+   LCD.setCursor(10,1);  //Set cursor to first column of second row
+  LCD.print("                "); //Print blanks to clear the row
+  LCD.setCursor(0,1);   //Set Cursor again to first column of second row
+  
+  if (distance_inc > 132 || distance_inc <= 0){
+  LCD.print("Not Detect");//for show in LCD
+  }
+  
+  
+  else{
+  LCD.setCursor(0,1);   //Set Cursor again to first column of second row
+  LCD.print("Same as:");//Print in LCD
+  LCD.print(distance_inc,1); //Print measured distance
+  LCD.print("In ");  //Print your units
+  delay(1000);//Delay in milisecond
+  }
+}
